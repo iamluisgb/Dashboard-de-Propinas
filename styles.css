@@ -1,0 +1,13 @@
+:root {
+    --bslib-sidebar-main-bg: #f8f8f8;  /* Color de fondo para la barra lateral */
+  }
+  
+  .popover {
+    --bs-popover-header-bg: #222;      /* Color de fondo para cabeceras de popovers */
+    --bs-popover-header-color: #fff;   /* Color de texto para cabeceras de popovers */
+  }
+  
+  .popover .btn-close {
+    filter: var(--bs-btn-close-white-filter);  /* Filtro para botón de cierre */
+  }
+  
