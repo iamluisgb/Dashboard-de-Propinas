@@ -1,13 +1,79 @@
+/* Estilos personalizados para el dashboard */
 :root {
-    --bslib-sidebar-main-bg: #f8f8f8;  /* Color de fondo para la barra lateral */
-  }
-  
-  .popover {
-    --bs-popover-header-bg: #222;      /* Color de fondo para cabeceras de popovers */
-    --bs-popover-header-color: #fff;   /* Color de texto para cabeceras de popovers */
-  }
-  
-  .popover .btn-close {
-    filter: var(--bs-btn-close-white-filter);  /* Filtro para botón de cierre */
-  }
-  
+  --bslib-sidebar-main-bg: #f0f7ff;  /* Azul suave para sidebar */
+  --main-accent-color: #3498db;      /* Color de acento principal */
+  --secondary-color: #2ecc71;        /* Color secundario */
+  --card-header-bg: #f8f9fa;         /* Color de cabeceras */
+}
+
+/* Estilo para la barra lateral */
+.sidebar {
+  border-right: 1px solid #dee2e6;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Efectos para las cajas de valores */
+.value-box {
+  transition: transform 0.2s ease;
+}
+
+.value-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Colores por caja de valor */
+.value-box:nth-child(1) {
+  --value-box-accent: var(--main-accent-color);
+}
+
+.value-box:nth-child(2) {
+  --value-box-accent: var(--secondary-color);
+}
+
+.value-box:nth-child(3) {
+  --value-box-accent: #e74c3c; /* Rojo */
+}
+
+.value-box:nth-child(4) {
+  --value-box-accent: #9b59b6; /* Morado */
+}
+
+/* Estilos para tarjetas */
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  background-color: var(--card-header-bg);
+  border-bottom: 2px solid var(--main-accent-color);
+  font-weight: bold;
+}
+
+/* Estilo para los popovers */
+.popover {
+  --bs-popover-header-bg: var(--main-accent-color);
+  --bs-popover-header-color: #fff;
+  --bs-popover-border-color: var(--main-accent-color);
+  border-radius: 6px;
+}
+
+.card {
+  margin-bottom: 15px;
+}
+
+.js-plotly-plot {
+  width: 100%;
+  height: 100%;
+}
+
+.grid-output {
+  height: 100%;
+  overflow: auto;
+}
