@@ -30,6 +30,14 @@ with ui.sidebar(open='desktop'):
         selected=['Lunch', 'Dinner'],
         inline=True,
     )
+    ui.input_selectize(
+    "day",                           # ID del input
+    "Day of the week",               # Etiqueta para el usuario
+    ["Thur", "Fri", "Sat", "Sun"],   # Opciones disponibles
+    selected=["Thur", "Fri", "Sat", "Sun"], # Selección inicial
+    multiple=True                    # Permitir selección múltiple
+    )
+
     ui.input_action_button('reset', 'Reset filter')
 
 # Definir iconos para la interfaz
@@ -156,7 +164,8 @@ def tips_data():
     bill = input.total_bill()
     idx1 = tips.total_bill.between(bill[0], bill[1])
     idx2 = tips.time.isin(input.time())
-    return tips[idx1 & idx2]
+    idx3 = tips.day.isin(input.day()) 
+    return tips[idx1 & idx2 & idx3]
 
 # Efecto reactivo para restablecer filtros cuando se hace clic en el botón
 @reactive.effect
@@ -164,3 +173,4 @@ def tips_data():
 def _():
     ui.update_slider('total_bill', value=bill_rng)
     ui.update_checkbox_group('time', selected=['Lunch', "Dinner"])
+    ui.update_select("day", selected=["Thur", "Fri", "Sat", "Sun"]) 
