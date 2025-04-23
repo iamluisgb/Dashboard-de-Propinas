@@ -91,10 +91,10 @@ with ui.layout_columns(col_widths=[3,3,3,3], fill=False):
                 bill = d.total_bill.mean()
                 f"{bill:.2f}€" 
 
-# Modificar el diseño para optimizar espacio y tamaño de gráficos
+
 # Tabla y gráfico de dispersión en la primera fila
 with ui.layout_columns(col_widths=[6, 6]):
-    with ui.card(full_screen=True, height="400px"):  # Establecer altura fija
+    with ui.card(full_screen=True, height="400px"):  
         ui.card_header('Tabla de propinas')
 
         @render.data_frame
@@ -102,7 +102,7 @@ with ui.layout_columns(col_widths=[6, 6]):
             return render.DataGrid(tips_data())
         
     # Segunda tarjeta: Gráfico de dispersión
-    with ui.card(full_screen=True, height="400px"):  # Establecer altura fija
+    with ui.card(full_screen=True, height="400px"):  
         with ui.card_header(class_="d-flex justify-content-between align-items-center"):
             "Total Factura vs Propina"
             # Menú emergente para opciones de color
@@ -190,20 +190,19 @@ with ui.layout_columns(col_widths=[6, 6]):
             return plt
     
     # Gráfico de barras por día de la semana
-    with ui.card(full_screen=True, height="400px"):  # Establecer altura fija
+    with ui.card(full_screen=True, height="400px"):
         with ui.card_header(class_="d-flex justify-content-between align-items-center"):
             "Propinas por día de la semana"
-            with ui.popover(title="Opciones de visualización"):
+            with ui.popover(title='Opciones de visualiación'):
                 ICONS["ellipsis"]
                 ui.input_radio_buttons(
-                    "bar_metric",
-                    "Métrica:",
-                    ["Total propinas", "Propina media", "Porcentaje de propina"],
-                    selected="Total propinas",
-                    inline=True,
+                    'bar_metric',
+                    'Métrica:',
+                    ['Total propinas', 'Propina media', 'Porcentaje medio de propina'],
+                    selected='Total propinas'
                 )
                 ui.input_checkbox(
-                    "show_day_count",
+                    'show_day_count',
                     "Muestra el número de visitas por día",
                     value=True
                 )
@@ -213,96 +212,70 @@ with ui.layout_columns(col_widths=[6, 6]):
             data = tips_data()
             
             if data.shape[0] == 0:
-                return px.bar(title="No hay dato para mostrar con los filtros actuales")
+                return px.bar(title='No hay datos para mostrar con los filtros actuales')
             
             metric = input.bar_metric()
+
+            if metric == 'Total propinas':
+                day_tips = data.groupby('day')['tip'].sum().reset_index()
+                y_title = 'Total propinas (€)'
+
+            elif metric == 'Propina media':
+                day_tips = data.groupby('day')['tip'].mean().reset_index()
+                y_title = "Propina media (€)"                    
+
+            else: #Porcentaje medio de propina
+                data['percent'] = data.tip / data.total_bill * 100
+                day_tips = data.groupby('day')['percent'].mean().reset_index()
+                y_title = 'Porcentaje de propina medio (%)'
             
-            if metric == "Total propinas":
-                day_tips = data.groupby("day")["tip"].sum().reset_index()
-                day_tips.columns = ["day", "value"]
-                y_title = "Total propinas (€)"
-            
-            elif metric == "Propina media":
-                day_tips = data.groupby("day")["tip"].mean().reset_index()
-                day_tips.columns = ["day", "value"]
-                y_title = "Propina media (€)"
-            
-            else:  # Tip percentage
-                data["percent"] = data.tip / data.total_bill * 100
-                day_tips = data.groupby("day")["percent"].mean().reset_index()
-                day_tips.columns = ["day", "value"]
-                y_title = "Porcentaje de propina medio (%)"
-            
+            # Renombrar columnas
+            day_tips.columns = ['day', 'value']
+
             # Ordenar los días correctamente
-            day_order = ["Thur", "Fri", "Sat", "Sun"]
-            day_tips["day"] = pd.Categorical(day_tips["day"], categories=day_order, ordered=True)
-            day_tips = day_tips.sort_values("day")
-            
+            day_order = ['Thur', 'Fri', 'Sat', 'Sun']
+            day_tips['day'] = pd.Categorical(day_tips['day'], categories=day_order, ordered=True)
+            day_tips = day_tips.sort_values('day')
+
+            # Configuración base para la gráfica
+            fig_params = {
+                'x': 'day',
+                'y': 'value',
+                'color': 'day',
+                'labels': {'vañue': y_title, 'day': 'Día de la semana'},
+                'title': f'{metric} por día de la semana'
+            }
+
             # Mostrar conteo de visitas si está activado
             if input.show_day_count():
-                day_count = data.groupby("day").size().reset_index()
-                day_count.columns = ["day", "count"]
-                day_count["day"] = pd.Categorical(day_count["day"], categories=day_order, ordered=True)
-                day_count = day_count.sort_values("day")
-                
+                day_count = data.groupby('day').size().reset_index()
+                day_count.columns = ['day', 'count']
+                day_count['day'] = pd.Categorical(day_count['day'], categories=day_order, ordered=True)
+                day_count = day_count.sort_values('day')
+
+                fig_params['custom_data'] = [day_count['count']]
+
                 hover_template = "<b>%{x}</b><br>" + \
-                                f"{y_title}: %{{y:.2f}}<br>" + \
-                                "Número de visitas: %{customdata}<br>"
-                
-                fig = px.bar(
-                    day_tips,
-                    x="day",
-                    y="value",
-                    color="day",
-                    custom_data=[day_count["count"]],
-                    labels={"value": y_title, "day": "Day of week"},
-                    title=f"{metric} por día de la semana"
-                )
-                
+                            f"{y_title}: %{{y:.2f}}<br>" + \
+                            "Número de visitas: %{customdata}<br>"
+                fig = px.bar(day_tips, **fig_params)
                 fig.update_traces(hovertemplate=hover_template)
             else:
-                fig = px.bar(
-                    day_tips,
-                    x="day",
-                    y="value",
-                    color="day",
-                    labels={"value": y_title, "day": "Day of week"},
-                    title=f"{metric} por día de la semana"
-                )
-            
+                fig = px.bar(day_tips, **fig_params)
+
             fig.update_layout(
                 showlegend=False,
-                xaxis_title="Día de la semana",
-                yaxis_title=y_title,
                 autosize=True,
                 margin=dict(l=50, r=30, t=30, b=50)
             )
-            
-            return fig
-        
-with ui.layout_columns():
-    with ui.card(full_screen=True, height="350px"):
-        ui.card_header("Gráfico Simple de Propinas por Día")
-        
-        @render_plotly
-        def simple_bar_chart():
-            # Calculamos la suma de propinas por día
-            tips_by_day = tips_data().groupby('day')['tip'].sum().reset_index()
-            
-            # Ordenar los días correctamente
-            day_order = ["Thur", "Fri", "Sat", "Sun"]
-            tips_by_day["day"] = pd.Categorical(tips_by_day["day"], categories=day_order, ordered=True)
-            tips_by_day = tips_by_day.sort_values("day")
-            
-            # Crear el gráfico simple
-            fig = px.bar(
-                tips_by_day, 
-                x='day', 
-                y='tip',
-            )
-            
+
             return fig
 
+
+
+                
+            
+        
 
 # Añadir estilos CSS personalizados
 ui.include_css(app_dir / "styles.css")
