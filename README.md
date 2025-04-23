@@ -11,6 +11,11 @@ Este dashboard interactivo analiza patrones de propinas en restaurantes utilizan
 
 Desarrollado con Shiny para Python, este proyecto demuestra la implementación de una aplicación web de análisis de datos completamente interactiva sin necesidad de conocimientos de desarrollo web tradicional.
 
+Prueba la aplicación en línea:
+[Ver demostración](https://iamluisgb-dashboard-de-propinas.share.connect.posit.cloud/)
+
+![Dashboard](./img/dashboard-screenshot.png)
+
 ## 🔍 Características principales
 
 - **Filtros interactivos** que permiten segmentar los datos por rango de factura y momento del servicio
